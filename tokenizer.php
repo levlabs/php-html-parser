@@ -13,7 +13,6 @@ const TOKENIZER_EVENT = [
   "TEXT" => 'text',
   "DONE" => 'done'
 ];
-
 const TOKENIZER_STATE = [
   "TAG" => 1,
   "TEXT" => 2,
@@ -77,10 +76,15 @@ function get_comment_open ($text, $i)
 
 function read_attr ($str, $i)
 {
-  $regex = "/(\s*(\".*?\"|'.*?'|[^\s\"'>]+))/";
+  //$regex = "/(\s*(\".*?\"|'.*?'|[^\s\"'>]+))/";
+  $regex = "/(\s*(\".*?\"|'.*?'|[^\"'>]+))/";
+
   preg_match($regex, $str, $match, PREG_OFFSET_CAPTURE, $i);
   $val = $match[2][0];
+
+
   $quote = $val[0];
+  $val_len = strlen($val);
 
   if ($quote === '"' || $quote === "'")
   {
@@ -89,7 +93,7 @@ function read_attr ($str, $i)
     {
       return [
         "length" => strlen($val),
-        "value" => substr($val, 1)
+        "value" => $val
       ];
     }
     else
@@ -102,8 +106,10 @@ function read_attr ($str, $i)
   }
   else
   {
+    $end_idx = strcspn($val, " \t\r\n>/", 1);
+
     return [
-      "length" => strlen($val),
+      "length" => strlen($val) + 2,
       "value" => $val
     ];
   }
@@ -164,7 +170,8 @@ function new_tokenizer ()
       }
     };
 
-    // Haupt-Tokenisierungslogik
+    yield ["type" => TOKENIZER_EVENT["START"]];
+
     while ($i < $end)
     {
       switch ($state)
@@ -244,3 +251,11 @@ function new_tokenizer ()
 
   return compact('tokenize');
 }
+
+
+/*$html = file_get_contents('srob.html');
+
+foreach (tokenize($html) as $token)
+{
+  var_dump($token);
+}*/

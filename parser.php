@@ -169,9 +169,9 @@ function new_parser (): array
           yield ['type' => PARSER_EVENT['TEXT'], 'text' => canonicalize_newlines($text)];
           break;
         case TOKENIZER_EVENT['ATTRIBUTE']:
-          if (isset($value))
+          if (isset($event['value']))
           {
-            $cur_tag['attrs'][$name] = $value;
+            $cur_tag['attrs'][$name] = $event['value'];
           }
           else
           {
